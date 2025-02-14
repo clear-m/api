@@ -302,6 +302,35 @@ paths:
       - devices_auth:
         - "write:devices"
         - "read:devices"
+  /operation:
+    post:
+      tags:
+      - "operation"
+      summary: "Add a new operation "
+      description: ""
+      operationId: "addOperation"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Operation object that needs to be added "
+        required: true
+        schema:
+          $ref: "#/definitions/Operation"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Operation"
+        405:
+          description: "Invalid input"
+      security:
+      - api_key: []
   /operation/{opId}/execute:
     get:
       tags:
@@ -330,7 +359,6 @@ paths:
           schema:
             type: "string"
             format: "base64"
-
         400:
           description: "Invalid ID supplied"
         404:
