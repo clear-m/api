@@ -371,7 +371,7 @@ paths:
       - "board"
       summary: "uploads an firmware"
       description: ""
-      operationId: "uploadFile"
+      operationId: "uploadBoardFile"
       consumes:
       - "multipart/form-data"
       produces:
