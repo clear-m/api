@@ -1,0 +1,904 @@
+---
+swagger: "2.0"
+info:
+  description: "This is a simple ALIOT board server Devices API.  You can find out more about\
+    \ Swagger at [http://swagger.io](http://swagger.io) or on [irc.freenode.net, #swagger](http://swagger.io/irc/).\
+    \  For this sample, you can use the api key `special-key` to test the authorization\
+    \ filters."
+  version: "1.0.0"
+  title: "Devices API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "apiteam@swagger.io"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "clear-m.github.io/api"
+basePath: "/v1"
+tags:
+- name: "device"
+  description: "Everything about your Device"
+  externalDocs:
+    description: "Find out more"
+    url: "https://clear-m.github.io/UI/device_mock.html"
+- name: "devices"
+  description: "Everything about your Devices"
+  externalDocs:
+    description: "Find out more"
+    url: "https://clear-m.github.io/UI/devices_mock.html"    
+- name: "board"
+  description: "Board operations"
+  externalDocs:
+    description: "Find out more"
+    url: "https://clear-m.github.io/UI/status_mock.html"
+- name: "user"
+  description: "User operations"
+  externalDocs:
+    description: "Find out more"
+    url: "https://clear-m.github.io/UI/login_mock.html"
+- name: "operation"
+  description: "Devices operations"
+  externalDocs:
+    description: "Find out more"
+    url: "https://clear-m.github.io/UI/device_mock.html"
+schemes:
+- "https"
+- "http"
+paths:
+  /device/{deviceId}/uploadFirmware:
+    post:
+      tags:
+      - "device"
+      summary: "uploads an firmware"
+      description: ""
+      operationId: "uploadFile"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deviceId"
+        in: "path"
+        description: "ID of device to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "additionalMetadata"
+        in: "formData"
+        description: "Additional data to pass to server"
+        required: false
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "file to upload"
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+  /device:
+    post:
+      tags:
+      - "device"
+      summary: "Add a new device "
+      description: ""
+      operationId: "addDevice"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Device object that needs to be added "
+        required: true
+        schema:
+          $ref: "#/definitions/Device"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+    put:
+      tags:
+      - "device"
+      summary: "Update an existing device"
+      description: ""
+      operationId: "updateDevice"
+      consumes:
+      - "application/json"
+      - "application/xml"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Device object that needs to be added "
+        required: true
+        schema:
+          $ref: "#/definitions/Device"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Device not found"
+        405:
+          description: "Validation exception"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+  /device/findByStatus:
+    get:
+      tags:
+      - "device"
+      summary: "Finds Devices by status"
+      description: "Multiple status values can be provided with comma separated strings"
+      operationId: "findDevicesByStatus"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "status"
+        in: "query"
+        description: "Status values that need to be considered for filter"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+          enum:
+          - "available"
+          - "pending"
+          - "sold"
+          default: "available"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Device"
+        400:
+          description: "Invalid status value"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+  /device/findByTags:
+    get:
+      tags:
+      - "device"
+      summary: "Finds Devices by tags"
+      description: "Multiple tags can be provided with comma separated strings. Use\
+        \ tag1, tag2, tag3 for testing."
+      operationId: "findDevicesByTags"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "tags"
+        in: "query"
+        description: "Tags to filter by"
+        required: true
+        type: "array"
+        items:
+          type: "string"
+        collectionFormat: "multi"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "array"
+            items:
+              $ref: "#/definitions/Device"
+        400:
+          description: "Invalid tag value"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+      deprecated: false
+  /device/{deviceId}:
+    get:
+      tags:
+      - "device"
+      summary: "Find device by ID"
+      description: "Returns a single device"
+      operationId: "getDeviceById"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "deviceId"
+        in: "path"
+        description: "ID of device to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Device"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Device not found"
+      security:
+      - api_key: []
+    post:
+      tags:
+      - "device"
+      summary: "Updates a device with form data"
+      description: ""
+      operationId: "updateDeviceWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "deviceId"
+        in: "path"
+        description: "ID of device that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "name"
+        in: "formData"
+        description: "Updated name of the device"
+        required: false
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "Updated status of the device"
+        required: false
+        type: "string"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+    delete:
+      tags:
+      - "device"
+      summary: "Deletes a device"
+      description: ""
+      operationId: "deleteDevice"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "api_key"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "deviceId"
+        in: "path"
+        description: "Device id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Device not found"
+      security:
+      - devices_auth:
+        - "write:devices"
+        - "read:devices"
+  /operation/{opId}/execute:
+    get:
+      tags:
+      - "operation"
+      summary: "Execute operation onto devices by design"
+      description: "Returns an operation status with data"
+      operationId: "execute"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "opId"
+        in: "path"
+        description: "Operation ID"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "Operation"
+        in: "body"
+        required: true
+        schema:
+          $ref: "#/definitions/Operation"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "string"
+            format: "base64"
+
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Device or Op not found"
+      security:
+      - api_key: []
+  /board/{boardId}/uploadFirmware:
+    post:
+      tags:
+      - "board"
+      summary: "uploads an firmware"
+      description: ""
+      operationId: "uploadFile"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "boardId"
+        in: "path"
+        description: "ID of the board to update"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "additionalMetadata"
+        in: "formData"
+        description: "Additional data to pass to server"
+        required: false
+        type: "string"
+      - name: "file"
+        in: "formData"
+        description: "file to upload"
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/ApiResponse"
+      security:
+      - devices_auth:
+        - "write:board"
+        - "read:board"
+  /board/{boardId}/downloadFirmware:
+    get:
+      tags:
+      - "board"
+      summary: "Find board by ID"
+      description: "Returns board firmware"
+      operationId: "getBoardById"
+      produces:
+      - "application/x-freearc"
+      parameters:
+      - name: "boardId"
+        in: "path"
+        description: "ID of the board to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            type: "file"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Board not found"
+      security:
+      - api_key: []
+  /board/{boardId}:
+    get:
+      tags:
+      - "board"
+      summary: "Find board by ID"
+      description: "Returns a single board"
+      operationId: "getBoardById"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "boardId"
+        in: "path"
+        description: "ID of the board to return"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Board"
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Board not found"
+      security:
+      - api_key: []
+    post:
+      tags:
+      - "board"
+      summary: "Updates a board with form data"
+      description: ""
+      operationId: "updateBoardWithForm"
+      consumes:
+      - "application/x-www-form-urlencoded"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "boardId"
+        in: "path"
+        description: "ID of board that needs to be updated"
+        required: true
+        type: "integer"
+        format: "int64"
+      - name: "name"
+        in: "formData"
+        description: "Updated name of the board"
+        required: false
+        type: "string"
+      - name: "status"
+        in: "formData"
+        description: "Updated status of the board"
+        required: false
+        type: "string"
+      responses:
+        405:
+          description: "Invalid input"
+      security:
+      - devices_auth:
+        - "write:board"
+        - "read:board"
+    delete:
+      tags:
+      - "board"
+      summary: "Deletes a board record"
+      description: ""
+      operationId: "deleteBoard"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "api_key"
+        in: "header"
+        required: false
+        type: "string"
+      - name: "boardId"
+        in: "path"
+        description: "Board id to delete"
+        required: true
+        type: "integer"
+        format: "int64"
+      responses:
+        400:
+          description: "Invalid ID supplied"
+        404:
+          description: "Board not found"
+      security:
+      - devices_auth:
+        - "write:board"
+        - "read:board"
+  /devices:
+    get:
+      tags:
+      - "devices"
+      summary: "Simply get all devices"
+      description: "Returns all devices on the board"
+      operationId: "getDevices"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/Devices"
+        404:
+          description: "Not found"
+      security:
+      - api_key: []
+  /user/createWithArray:
+    post:
+      tags:
+      - "user"
+      summary: "Creates list of users with given input array"
+      description: ""
+      operationId: "createUsersWithArrayInput"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List of user object"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+  /user/createWithList:
+    post:
+      tags:
+      - "user"
+      summary: "Creates list of users with given input array"
+      description: ""
+      operationId: "createUsersWithListInput"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "List of user object"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+  /user/{username}:
+    get:
+      tags:
+      - "user"
+      summary: "Get user by user name"
+      description: ""
+      operationId: "getUserByName"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be fetched. Use user1 for testing. "
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/User"
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+    put:
+      tags:
+      - "user"
+      summary: "Updated user"
+      description: "This can only be done by the logged in user."
+      operationId: "updateUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "name that need to be updated"
+        required: true
+        type: "string"
+      - in: "body"
+        name: "body"
+        description: "Updated user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        400:
+          description: "Invalid user supplied"
+        404:
+          description: "User not found"
+    delete:
+      tags:
+      - "user"
+      summary: "Delete user"
+      description: "This can only be done by the logged in user."
+      operationId: "deleteUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "path"
+        description: "The name that needs to be deleted"
+        required: true
+        type: "string"
+      responses:
+        400:
+          description: "Invalid username supplied"
+        404:
+          description: "User not found"
+  /user/login:
+    get:
+      tags:
+      - "user"
+      summary: "Logs user into the system"
+      description: ""
+      operationId: "loginUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - name: "username"
+        in: "query"
+        description: "The user name for login"
+        required: true
+        type: "string"
+      - name: "password"
+        in: "query"
+        description: "The password for login in clear text"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "successful operation"
+          headers:
+            X-Expires-After:
+              type: "string"
+              format: "date-time"
+              description: "date in UTC when token expires"
+            X-Rate-Limit:
+              type: "integer"
+              format: "int32"
+              description: "calls per hour allowed by the user"
+          schema:
+            type: "string"
+        400:
+          description: "Invalid username/password supplied"
+  /user/logout:
+    get:
+      tags:
+      - "user"
+      summary: "Logs out current logged in user session"
+      description: ""
+      operationId: "logoutUser"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters: []
+      responses:
+        default:
+          description: "successful operation"
+  /user:
+    post:
+      tags:
+      - "user"
+      summary: "Create user"
+      description: "This can only be done by the logged in user."
+      operationId: "createUser"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      - "application/xml"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Created user object"
+        required: true
+        schema:
+          $ref: "#/definitions/User"
+      responses:
+        default:
+          description: "successful operation"
+securityDefinitions:
+  api_key:
+    type: "apiKey"
+    name: "api_key"
+    in: "header"
+  devices_auth:
+    type: "oauth2"
+    authorizationUrl: "https://Devicestore.swagger.io/oauth/authorize"
+    flow: "implicit"
+    scopes:
+      read:devices: "read your devices"
+      write:devices: "modify devices in your account"
+definitions:
+  ApiResponse:
+    type: "object"
+    properties:
+      code:
+        type: "integer"
+        format: "int32"
+      type:
+        type: "string"
+      message:
+        type: "string"
+  Category:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Category"
+  Device:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      category:
+        $ref: "#/definitions/Category"
+      name:
+        type: "string"
+        example: "devicie"
+      type_name:
+        type: "string"
+        example: "devicie_typie"
+      value_first:
+        type: "float"
+        example: "25.5"
+      value_second:
+        type: "float"
+        example: "12345"
+      photoUrls:
+        type: "array"
+        xml:
+          wrapped: true
+        items:
+          type: "string"
+          xml:
+            name: "photoUrl"
+      tags:
+        type: "array"
+        xml:
+          wrapped: true
+        items:
+          xml:
+            name: "tag"
+          $ref: "#/definitions/Tag"
+      status:
+        type: "string"
+        description: "device status in the store"
+        enum:
+        - "online"
+        - "offline"
+    xml:
+      name: "Device"
+  Board:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      category:
+        $ref: "#/definitions/Category"
+      devices:
+        $ref: "#/definitions/Devices"
+      tags:
+        type: "array"
+        xml:
+          wrapped: true
+        items:
+          xml:
+            name: "tag"
+          $ref: "#/definitions/Tag"
+    xml:
+      name: "Board"
+  Devices:
+    type: "object"
+    required:
+    - "name"
+    - "photoUrls"
+    properties:
+      count:
+        type: "integer"
+        format: "int64"
+      category:
+        $ref: "#/definitions/Category"
+      devices:
+        type: array
+        items:
+          $ref: "#/definitions/Device"
+      tags:
+        type: "array"
+        xml:
+          wrapped: true
+        items:
+          xml:
+            name: "tag"
+          $ref: "#/definitions/Tag"
+    xml:
+      name: "Devices"
+  Tag:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      name:
+        type: "string"
+    xml:
+      name: "Tag"
+  User:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      username:
+        type: "string"
+      firstName:
+        type: "string"
+      lastName:
+        type: "string"
+      email:
+        type: "string"
+      password:
+        type: "string"
+      phone:
+        type: "string"
+      userStatus:
+        type: "integer"
+        format: "int32"
+        description: "User Status"
+    xml:
+      name: "User"
+  Operation:
+    type: "object"
+    properties:
+      id:
+        type: "integer"
+        format: "int64"
+      operation_type:
+        type: "integer"
+        format: "int64"
+      data:
+        type: "string"
+        format: "base64"
+      user:
+        $ref: "#/definitions/User"
+      device:
+        $ref: "#/definitions/Device"
+      board:
+        $ref: "#/definitions/Board"
+      category:
+        $ref: "#/definitions/Category"
+      tags:
+        type: "array"
+        xml:
+          wrapped: true
+        items:
+          xml:
+            name: "tag"
+          $ref: "#/definitions/Tag"
+    xml:
+      name: "Operation"
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"

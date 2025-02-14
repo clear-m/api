@@ -1,0 +1,70 @@
+{
+    "count": 0,
+    "devices": [
+      {
+        "device_path": "/dev/ttyUSB0",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB1",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB2",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB3",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB4",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB5",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB6",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      },
+      {
+        "device_path": "/dev/ttyUSB7",
+        "online": 0,
+        "type": 10,
+        "type_name": "Unknown(not a sens)",
+        "value_first": 0,
+        "value_second": 0
+      }
+    ]
+  }
+  
