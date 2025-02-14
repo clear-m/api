@@ -408,7 +408,7 @@ paths:
       - "board"
       summary: "Find board by ID"
       description: "Returns board firmware"
-      operationId: "getBoardById"
+      operationId: "downloadFile"
       produces:
       - "application/x-freearc"
       parameters:
